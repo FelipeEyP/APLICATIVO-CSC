@@ -1,0 +1,88 @@
+name: Fabrica de Actualizaciones Automaticas
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'AutoUpdaterApp/app.py' # Solo se ejecutará si detecta que modificaste el código de la app
+
+jobs:
+  construir_y_publicar:
+    runs-on: windows-latest
+    permissions:
+      contents: write # Permiso para que el robot pueda subir archivos a tu repositorio
+
+    steps:
+      - name: 1. Descargar tu código
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 2. Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 3. Instalar librerías
+        run: |
+          cd AutoUpdaterApp
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: 4. Leer qué versión pusiste en app.py
+        id: get_version
+        shell: python
+        run: |
+          import re
+          import os
+          with open('AutoUpdaterApp/app.py', 'r', encoding='utf-8') as f:
+              content = f.read()
+          match = re.search(r'APP_VERSION\s*=\s*["\']([^"\']+)["\']', content)
+          version = match.group(1) if match else "1.0.0"
+          print(f"VERSION DETECTADA: {version}")
+          with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+              env_file.write(f"APP_VERSION={version}\n")
+
+      - name: 5. Compilar a .exe con PyInstaller
+        run: |
+          cd AutoUpdaterApp
+          pyinstaller --noconfirm --noconsole --onefile --name "Aplicativo_CSC" --icon="app_icon.ico" --add-data "app_icon.ico;." app.py
+
+      - name: 6. Actualizar versión en Inno Setup
+        run: |
+          cd AutoUpdaterApp
+          (Get-Content instalador.iss) -replace 'AppVersion=.*', "AppVersion=${{ env.APP_VERSION }}" | Set-Content instalador.iss
+          (Get-Content instalador.iss) -replace 'OutputBaseFilename=.*', "OutputBaseFilename=setup_v${{ env.APP_VERSION }}" | Set-Content instalador.iss
+
+      - name: 7. Compilar el Instalador Oficial
+        run: |
+          cd AutoUpdaterApp
+          iscc instalador.iss
+
+      - name: 8. Modificar version.json mágicamente
+        run: |
+          cd AutoUpdaterApp
+          $version = "${{ env.APP_VERSION }}"
+          $url = "https://github.com/${{ github.repository }}/releases/download/v$version/setup_v$version.exe"
+          $json = @{
+              version = $version
+              download_url = $url
+          } | ConvertTo-Json
+          $json | Set-Content version.json
+          
+          git config --global user.name "Robot de Actualizaciones"
+          git config --global user.email "robot@github.com"
+          git add version.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-update version.json a v$version [skip ci]"
+          git push
+
+      - name: 9. Crear Release y Subir Instalador a Internet
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.APP_VERSION }}
+          name: Versión ${{ env.APP_VERSION }}
+          files: AutoUpdaterApp/Output/setup_v${{ env.APP_VERSION }}.exe
+          body: "Actualización automática generada por GitHub Actions."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
