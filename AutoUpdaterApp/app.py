@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "1.0.0"
+APP_VERSION = "2.0.0"
 # Esta URL apunta al raw de tu archivo version.json en tu GitHub
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/refs/heads/main/version.json" 
 
