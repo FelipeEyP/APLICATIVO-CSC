@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "1.0.0" # Actualizamos para forzar un nuevo build
+APP_VERSION = "1.0.1" # Actualizamos para forzar un nuevo build
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
