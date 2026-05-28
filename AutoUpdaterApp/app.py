@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "3.0.0" # ¡Versión Mayor! Nuevo sistema de actualización profesional
+APP_VERSION = "3.0.1" # ¡Versión para arreglar icono y probar Hot-Swap!
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):

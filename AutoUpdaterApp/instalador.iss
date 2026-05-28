@@ -1,6 +1,6 @@
 [Setup]
 AppName=Aplicativo CSC
-AppVersion=1.0.0
+AppVersion=3.0.1
 DefaultDirName={autopf}\Aplicativo CSC
 DefaultGroupName=Aplicativo CSC
 OutputDir=Output
@@ -16,6 +16,7 @@ Name: "desktopicon"; Description: "Crear un acceso directo en el escritorio"; Gr
 
 [Files]
 Source: "dist\Aplicativo_CSC.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "app_icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\Aplicativo CSC"; Filename: "{app}\Aplicativo_CSC.exe"; IconFilename: "{app}\app_icon.ico"
