@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "3.0.2" # ¡Versión para arreglar icono y probar Hot-Swap!
+APP_VERSION = "3.0.3" # Versión con anti-caché incorporado
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
@@ -97,7 +97,10 @@ class ModernApp(ctk.CTk):
     def check_for_updates(self):
         try:
             # Intentar conectar a internet (a tu GitHub)
-            response = requests.get(UPDATE_URL, timeout=5)
+            import time
+            # Añadimos un timestamp para burlar el caché de 5 minutos de GitHub Raw
+            url_fresca = f"{UPDATE_URL}?t={int(time.time())}"
+            response = requests.get(url_fresca, timeout=5)
             response.raise_for_status()
             data = response.json()
             
