@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "3.0.5" # Versión con corrección de PyInstaller _MEIPASS herencia
+APP_VERSION = "3.0.6" # Versión con desacoplamiento total de procesos Windows
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
@@ -175,10 +175,16 @@ class ModernApp(ctk.CTk):
                 
                 # Preparar entorno limpio (burlar herencia de PyInstaller)
                 env = os.environ.copy()
-                env.pop("_MEIPASS", None)
+                keys_to_remove = [k for k in env.keys() if k.startswith("_MEI") or k.startswith("_PYI_")]
+                for k in keys_to_remove:
+                    env.pop(k, None)
                 
                 # Lanzar el nuevo ejecutable de forma totalmente independiente
-                subprocess.Popen([current_exe], env=env)
+                if os.name == 'nt':
+                    import subprocess
+                    subprocess.Popen([current_exe], env=env, close_fds=True, creationflags=subprocess.DETACHED_PROCESS)
+                else:
+                    subprocess.Popen([current_exe], env=env, close_fds=True)
                 os._exit(0)
             else:
                 self.status_label.configure(text="Actualización simulada (Estás en Python puro).", text_color="gray")
