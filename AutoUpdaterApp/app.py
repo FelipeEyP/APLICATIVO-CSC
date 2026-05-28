@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "3.0.4" # Versión con corrección de PyInstaller _MEIPASS herencia
+APP_VERSION = "3.0.5" # Versión con corrección de PyInstaller _MEIPASS herencia
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
