@@ -9,12 +9,21 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "2.0.5" # Actualizamos para forzar un nuevo build
+APP_VERSION = "3.0.0" # ¡Versión Mayor! Nuevo sistema de actualización profesional
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        # --- LIMPIAR BASURA DE ACTUALIZACIONES ANTERIORES ---
+        if getattr(sys, 'frozen', False):
+            old_exe = sys.executable + ".old"
+            if os.path.exists(old_exe):
+                try:
+                    os.remove(old_exe)
+                except:
+                    pass
 
         # --- ARREGLO PARA ÍCONO EN BARRA DE TAREAS (WINDOWS) ---
         try:
@@ -94,11 +103,12 @@ class ModernApp(ctk.CTk):
             
             remote_version = data.get("version")
             download_url = data.get("download_url")
+            exe_url = data.get("exe_url") # Nueva URL del ejecutable crudo
 
             # Si hay internet, verificar versión
             if self.is_newer_version(remote_version, APP_VERSION):
                 self.status_label.configure(text=f"Actualización obligatoria (v{remote_version})\nDebes actualizar para continuar.", text_color="#00FF00")
-                self.action_btn.configure(text="Actualizar Ahora", state="normal", command=lambda: self.start_download(download_url))
+                self.action_btn.configure(text="Actualizar Ahora", state="normal", command=lambda: self.start_download(download_url, exe_url))
                 self.action_btn.grid() # Mostrar botón de actualizar
             else:
                 # Todo bien: hay internet y es la versión correcta. ¡DESBLOQUEAR APP!
@@ -124,28 +134,45 @@ class ModernApp(ctk.CTk):
         except:
             return False
 
-    def start_download(self, download_url):
-        self.action_btn.configure(state="disabled", text="Descargando...")
-        threading.Thread(target=self.download_and_install, args=(download_url,), daemon=True).start()
+    def start_download(self, download_url, exe_url):
+        self.action_btn.configure(state="disabled", text="Actualizando, espere un momento...")
+        threading.Thread(target=self.download_and_install, args=(download_url, exe_url), daemon=True).start()
 
-    def download_and_install(self, download_url):
+    def download_and_install(self, download_url, exe_url):
         try:
-            self.status_label.configure(text="Descargando nueva versión...\nPor favor, no cierres esta ventana.", text_color="orange")
+            self.status_label.configure(text="Descargando actualización en segundo plano...\nPor favor, espere un momento.", text_color="orange")
+            
+            # Si el JSON viejo no tiene exe_url, usamos el método tradicional de fallback
+            if not exe_url:
+                exe_url = download_url
             
             temp_dir = tempfile.gettempdir()
-            installer_path = os.path.join(temp_dir, "app_update.exe")
+            new_exe_path = os.path.join(temp_dir, "Aplicativo_CSC_new.exe")
             
-            urllib.request.urlretrieve(download_url, installer_path)
+            urllib.request.urlretrieve(exe_url, new_exe_path)
             
-            self.status_label.configure(text="¡Descarga completa! Instalando...", text_color="#00FF00")
+            self.status_label.configure(text="¡Instalando actualización! Reiniciando...", text_color="#00FF00")
             
-            # Lanzamos el instalador en modo silencioso y cerramos la app
-            subprocess.Popen([installer_path, '/SILENT', '/SUPPRESSMSGBOXES', '/NORESTART'])
-            os._exit(0)
+            if getattr(sys, 'frozen', False):
+                import shutil
+                current_exe = sys.executable
+                old_exe = current_exe + ".old"
+                
+                # Renombrar el ejecutable actual (Windows lo permite aunque esté corriendo)
+                os.rename(current_exe, old_exe)
+                
+                # Copiar el nuevo archivo descargado al nombre original
+                shutil.copy2(new_exe_path, current_exe)
+                
+                # Lanzar el nuevo ejecutable
+                subprocess.Popen([current_exe])
+                os._exit(0)
+            else:
+                self.status_label.configure(text="Actualización simulada (Estás en Python puro).", text_color="gray")
 
         except Exception as e:
-            self.status_label.configure(text="Error al descargar la actualización.\nRevisa tu internet.", text_color="red")
-            self.action_btn.configure(text="Reintentar descarga", state="normal", command=lambda: self.start_download(download_url))
+            self.status_label.configure(text="Error al instalar la actualización.\nRevisa tu internet o permisos.", text_color="red")
+            self.action_btn.configure(text="Reintentar descarga", state="normal", command=lambda: self.start_download(download_url, exe_url))
             print(f"Error download: {e}")
 
 if __name__ == "__main__":

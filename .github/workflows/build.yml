@@ -64,10 +64,12 @@ jobs:
         run: |
           cd AutoUpdaterApp
           $version = "${{ env.APP_VERSION }}"
-          $url = "https://github.com/${{ github.repository }}/releases/download/v$version/setup_v$version.exe"
+          $setup_url = "https://github.com/${{ github.repository }}/releases/download/v$version/setup_v$version.exe"
+          $exe_url = "https://github.com/${{ github.repository }}/releases/download/v$version/Aplicativo_CSC.exe"
           $json = @{
               version = $version
-              download_url = $url
+              download_url = $setup_url
+              exe_url = $exe_url
           } | ConvertTo-Json
           $json | Set-Content version.json
           
@@ -82,7 +84,9 @@ jobs:
         with:
           tag_name: v${{ env.APP_VERSION }}
           name: Versión ${{ env.APP_VERSION }}
-          files: AutoUpdaterApp/Output/setup_v${{ env.APP_VERSION }}.exe
+          files: |
+            AutoUpdaterApp/Output/setup_v${{ env.APP_VERSION }}.exe
+            AutoUpdaterApp/dist/Aplicativo_CSC.exe
           body: "Actualización automática generada por GitHub Actions."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
