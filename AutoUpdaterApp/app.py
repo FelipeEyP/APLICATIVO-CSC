@@ -9,7 +9,7 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "3.0.6" # Versión con desacoplamiento total de procesos Windows
+APP_VERSION = "3.0.7" # Versión con desacoplamiento total de procesos Windows
 UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
