@@ -139,7 +139,8 @@ class ModernApp(ctk.CTk):
             
             self.status_label.configure(text="¡Descarga completa! Instalando...", text_color="#00FF00")
             
-            subprocess.Popen([installer_path])
+            # Lanzamos el instalador en modo silencioso y cerramos la app
+            subprocess.Popen([installer_path, '/SILENT', '/SUPPRESSMSGBOXES', '/NORESTART'])
             os._exit(0)
 
         except Exception as e:
