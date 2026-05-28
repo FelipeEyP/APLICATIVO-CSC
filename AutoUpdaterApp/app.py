@@ -9,13 +9,20 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "2.0.1" # Cambiado para forzar al robot a trabajar
-# Esta URL apunta al raw de tu archivo version.json en tu GitHub
-UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/refs/heads/main/version.json" 
+APP_VERSION = "2.0.2" # Actualizamos para forzar un nuevo build
+UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/version.json" 
 
 class ModernApp(ctk.CTk):
     def __init__(self):
         super().__init__()
+
+        # --- ARREGLO PARA ÍCONO EN BARRA DE TAREAS (WINDOWS) ---
+        try:
+            import ctypes
+            myappid = 'felipeeyp.aplicativo.csc.1'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except Exception:
+            pass
 
         self.title(f"Aplicativo CSC - v{APP_VERSION}")
         self.geometry("600x400")
@@ -99,7 +106,8 @@ class ModernApp(ctk.CTk):
 
         except Exception as e:
             # Falló el internet o no pudo conectarse
-            self.status_label.configure(text="ERROR CRÍTICO: No hay conexión a internet.\nEl sistema requiere conexión para funcionar.", text_color="red")
+            error_msg = str(e)[:100] # Extraer un pedazo del error para verlo en pantalla
+            self.status_label.configure(text=f"ERROR DE CONEXIÓN: {error_msg}\nEl sistema requiere conexión para funcionar.", text_color="red")
             self.action_btn.configure(text="Reintentar conexión", state="normal", command=self.start_update_check)
             self.action_btn.grid()
 

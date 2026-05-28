@@ -18,9 +18,9 @@ Name: "desktopicon"; Description: "Crear un acceso directo en el escritorio"; Gr
 Source: "dist\Aplicativo_CSC.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Aplicativo CSC"; Filename: "{app}\Aplicativo_CSC.exe"
+Name: "{group}\Aplicativo CSC"; Filename: "{app}\Aplicativo_CSC.exe"; IconFilename: "{app}\app_icon.ico"
 Name: "{group}\Desinstalar Aplicativo CSC"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\Aplicativo CSC"; Filename: "{app}\Aplicativo_CSC.exe"; Tasks: desktopicon
+Name: "{autodesktop}\Aplicativo CSC"; Filename: "{app}\Aplicativo_CSC.exe"; IconFilename: "{app}\app_icon.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\Aplicativo_CSC.exe"; Description: "Lanzar Aplicativo CSC"; Flags: nowait postinstall skipifsilent
