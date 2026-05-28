@@ -1,0 +1,9 @@
+# Ignorar carpetas de compilación de Python / PyInstaller
+build/
+dist/
+*.spec
+__pycache__/
+
+# Ignorar archivos compilados de Inno Setup
+Output/
+*.exe
