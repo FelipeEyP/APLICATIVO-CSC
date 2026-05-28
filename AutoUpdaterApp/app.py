@@ -9,8 +9,8 @@ import tempfile
 import urllib.request
 
 # --- CONFIGURACIÓN DE LA APP ---
-APP_VERSION = "2.0.2" # Actualizamos para forzar un nuevo build
-UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/version.json" 
+APP_VERSION = "2.0.3" # Actualizamos para forzar un nuevo build
+UPDATE_URL = "https://raw.githubusercontent.com/FelipeEyP/APLICATIVO-CSC/main/AutoUpdaterApp/version.json"
 
 class ModernApp(ctk.CTk):
     def __init__(self):
